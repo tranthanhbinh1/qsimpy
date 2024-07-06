@@ -44,3 +44,7 @@ env.production.local/
 # Miscellaneous
 .DS_Store
 Thumbs.db
+
+#  Testing
+test.py
+test.ipynb
