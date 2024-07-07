@@ -1,7 +1,7 @@
 """
 QSimPy 0.1.0 - Gymnasium Environment
 Author: Hoa Nguyen
-Sample Gymasium environment for QSimPy with the scenario of 5 IBM QNodes (washington, kolkata, hanoi, perth, lagos) 
+Sample Gymasium environment for QSimPy with the scenario of 5 IBM QNodes (washington, kolkata, hanoi, perth, lagos)
 and continuous QTasks arrival, generated from a quantum circuit dataset.
 """
 
@@ -15,6 +15,10 @@ import simpy
 
 class QSimPyEnv(gym.Env):
     MAX_ROUNDS = 999  # maximum number of rounds in the QTask dataset
+
+    def __init__(self, dataset=None, config=None):
+        self.dataset = dataset
+        self.config = config
 
     class GymEnvQSimPy:
         """
@@ -51,7 +55,7 @@ class QSimPyEnv(gym.Env):
                 config (dict): Configuration parameters for the environment.
                 dataset (str): Path to the dataset.
             """
-            
+
             super().__init__()
 
             # OBSERVATION SPACE
@@ -80,7 +84,8 @@ class QSimPyEnv(gym.Env):
             # and [qubit_number, clops, next_available_time] for each node
             task_obs_low = np.array([0, 0, 0, 0], dtype=np.float64)
             task_obs_high = np.array(
-                [max_time, max_qubits, max_layers, max_rescheduling_count], dtype=np.float64
+                [max_time, max_qubits, max_layers, max_rescheduling_count],
+                dtype=np.float64,
             )
             node_obs_low = np.array([0, 0, -1] * self.n_qnodes, dtype=np.float64)
             node_obs_high = np.array(
@@ -247,10 +252,8 @@ class QSimPyEnv(gym.Env):
         # action is qnode_id
         # Intermediately reward is the inverse of completion time
         # Sample Objective: Minimize the total completion time of all qtasks
-        time_reward, _ = self.submit_task_to_qnode(
-            self.current_qtask, action
-        )
-        reward = 1/time_reward
+        time_reward, _ = self.submit_task_to_qnode(self.current_qtask, action)
+        reward = 1 / time_reward
 
         # Get the next observation
         # Check if there are more qtasks, if yes, get the next qtask, otherwise set terminated to True
